@@ -281,7 +281,23 @@ cd server
 npm test
 ```
 
-## 🚢 Deployment
+## 🐳 Docker
+
+### Start
+```bash
+docker-compose up --build
+```
+
+### Access
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+
+### Stop
+```bash
+docker-compose down
+```
+
+## 🚢 Traditional Deployment
 
 ### Frontend Deployment
 
