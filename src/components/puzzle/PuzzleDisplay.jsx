@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   DndContext,
   PointerSensor,
@@ -20,11 +20,12 @@ import ProofValidationDisplay from './ProofValidationDisplay';
 import { KatexRenderer } from '../renderers';
 import './PuzzleDisplay.css';
 
-const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle }) => {
+const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, onPuzzleTried }) => {
   const [availableBlocks, setAvailableBlocks] = useState([]);
   const [proofBlocks, setProofBlocks] = useState([]);
   const [activeId, setActiveId] = useState(null); 
   const [blockSelections, setBlockSelections] = useState({});
+  const triedReported = useRef(false);
 
   useEffect(() => {
     if (puzzle && puzzle.blocks) {
@@ -33,6 +34,7 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle }) => {
       setAvailableBlocks(shuffledBlocks);
       setProofBlocks([]);
       setBlockSelections({}); // Reset selections when puzzle changes
+      triedReported.current = false;
     }
   }, [puzzle]);
 
@@ -65,6 +67,11 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle }) => {
     setActiveId(null);
 
     if (!over) return;
+
+    if (!triedReported.current && onPuzzleTried) {
+      triedReported.current = true;
+      onPuzzleTried(puzzle.id, false);
+    }
 
     const activeId = active.id;
     const overId = over.id;
@@ -258,6 +265,7 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle }) => {
           onReset={handleReset}
           onNextPuzzle={onNextPuzzle}
           isLastPuzzle={isLastPuzzle}
+          onPuzzleTried={onPuzzleTried}
         />
       </div>
 

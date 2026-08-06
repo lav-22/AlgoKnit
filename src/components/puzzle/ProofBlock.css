@@ -20,6 +20,30 @@
   box-sizing: border-box; /* Include padding in width calculation */
   white-space: normal; /* Allow normal text flow */
   line-height: 1.5; /* Better line spacing for mixed content */
+  color: #ffffff;
+}
+
+.proof-block .mixed-latex-content,
+.proof-block .katex-prose,
+.proof-block .katex,
+.proof-block .katex-error {
+  color: #ffffff !important;
+}
+
+.proof-block .katex-prose {
+  font-family: inherit;
+  font-style: normal;
+  white-space: pre-wrap;
+}
+
+.proof-block .katex-math {
+  display: inline;
+}
+
+.proof-block .katex-math-display {
+  display: block;
+  margin: 0.5rem 0;
+  overflow-x: auto;
 }
 
 /* Emergency fallback for extremely long content that still doesn't wrap */

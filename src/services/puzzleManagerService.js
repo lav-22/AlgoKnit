@@ -2,7 +2,7 @@
 class PuzzleManagerService {
   constructor() {
     this.apiEnabled = true;
-    this.baseUrl = 'http://localhost:5000/api';
+    this.baseUrl = 'http://localhost:5001/api';
   }
 
   /**

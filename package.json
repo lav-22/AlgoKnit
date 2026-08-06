@@ -8,8 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dev:fullstack": "concurrently \"npm run dev:server\" \"npm run dev\"",
-    "dev:server": "cd server && npm run dev"
+    "dev:fullstack": "concurrently \"npm run dev:lean\" \"npm run dev:server\" \"npm run dev\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:lean": "cd lean-worker && npm start"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

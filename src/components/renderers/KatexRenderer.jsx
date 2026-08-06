@@ -1,6 +1,57 @@
 import React, { useEffect, useRef } from 'react';
 import katex from 'katex';
 
+const MATH_DELIMITER_PATTERN = /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$(?!\$)[^$]+?\$)/g;
+
+const renderLatex = (latex, element, displayMode = false) => {
+  katex.render(latex, element, {
+    throwOnError: false,
+    displayMode,
+    strict: false,
+  });
+};
+
+const appendText = (container, text) => {
+  if (!text) return;
+  const span = document.createElement('span');
+  span.className = 'katex-prose';
+  span.textContent = text;
+  container.appendChild(span);
+};
+
+const appendMath = (container, token) => {
+  const isDisplay = token.startsWith('\\[') || token.startsWith('$$');
+  const delimiterLength = token.startsWith('$$') ? 2 : 2;
+  const math = token.slice(delimiterLength, -delimiterLength).trim();
+  const span = document.createElement(isDisplay ? 'div' : 'span');
+  span.className = isDisplay ? 'katex-math katex-math-display' : 'katex-math';
+  renderLatex(math, span, isDisplay);
+  container.appendChild(span);
+};
+
+const renderDelimitedContent = (content, container) => {
+  const tokens = content.split(MATH_DELIMITER_PATTERN);
+  tokens.forEach((token) => {
+    if (!token) return;
+    if (/^(\\\[[\s\S]*\\\]|\\\([\s\S]*\\\)|\$\$[\s\S]*\$\$|\$(?!\$)[^$]+\$)$/.test(token)) {
+      appendMath(container, token);
+    } else {
+      appendText(container, token);
+    }
+  });
+};
+
+const hasMathDelimiters = (content) => {
+  MATH_DELIMITER_PATTERN.lastIndex = 0;
+  return MATH_DELIMITER_PATTERN.test(content);
+};
+
+const isLegacyLatex = (content) => {
+  const trimmed = content.trim();
+  return /^\\(?:text|begin|frac|forall|exists|neg|sqrt|sum|prod|lim|mathbb|mathbf|mathrm)\b/.test(trimmed)
+    || (!/\s/.test(trimmed) && /[\\^_={}]/.test(trimmed));
+};
+
 const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive = false, blockId = null }) => {
   const containerRef = useRef();
 
@@ -85,7 +136,9 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
       const placeholders = [...latex.matchAll(placeholderPattern)];
       
       if (placeholders.length === 0 || !isInteractive) {
-        // No placeholders or not interactive, render as pure LaTeX
+        // Render ordinary prose normally and only send delimited mathematics to
+        // KaTeX. Rendering an entire English sentence as math removes spaces,
+        // italicises the words, and displays parse failures in red.
         let processedLatex = latex;
         
         // Replace placeholders with their selected values
@@ -96,10 +149,14 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
           processedLatex = processedLatex.replace(fullMatch, value);
         });
         
-        katex.render(processedLatex, containerRef.current, {
-          throwOnError: false,
-          displayMode: false,
-        });
+        containerRef.current.innerHTML = '';
+        if (hasMathDelimiters(processedLatex)) {
+          renderDelimitedContent(processedLatex, containerRef.current);
+        } else if (isLegacyLatex(processedLatex)) {
+          renderLatex(processedLatex, containerRef.current);
+        } else {
+          appendText(containerRef.current, processedLatex);
+        }
         return;
       }
 
@@ -118,7 +175,11 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
           const latexBefore = latex.substring(lastIndex, matchStart);
           if (latexBefore.trim()) {
             const span = document.createElement('span');
-            katex.render(latexBefore, span, { throwOnError: false, displayMode: false });
+            if (hasMathDelimiters(latexBefore)) {
+              renderDelimitedContent(latexBefore, span);
+            } else {
+              appendText(span, latexBefore);
+            }
             containerRef.current.appendChild(span);
           }
         }
@@ -137,7 +198,11 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
         const latexAfter = latex.substring(lastIndex);
         if (latexAfter.trim()) {
           const span = document.createElement('span');
-          katex.render(latexAfter, span, { throwOnError: false, displayMode: false });
+          if (hasMathDelimiters(latexAfter)) {
+            renderDelimitedContent(latexAfter, span);
+          } else {
+            appendText(span, latexAfter);
+          }
           containerRef.current.appendChild(span);
         }
       }
@@ -152,7 +217,7 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
     renderMixedContent();
   }, [latex, variables, isInteractive, blockId]);
 
-  return <span ref={containerRef} />;
+  return <span ref={containerRef} className="mixed-latex-content" />;
 };
 
 export default KatexRenderer;

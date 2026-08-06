@@ -1,5 +1,5 @@
 // API service for interacting with the backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 class PuzzleService {
   constructor() {
@@ -17,7 +17,7 @@ class PuzzleService {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
     }
 
     return response.json();
@@ -37,6 +37,20 @@ class PuzzleService {
     const url = `/puzzles${queryString ? `?${queryString}` : ''}`;
     
     return this.fetchWithError(url);
+  }
+
+  async generatePuzzle({ userId, requestId, difficulty, topics }) {
+    return this.fetchWithError('/generate', {
+      method: 'POST',
+      body: JSON.stringify({ userId, requestId, difficulty, topics })
+    });
+  }
+
+  async recordPuzzleTried(puzzleId, userId, completed = false) {
+    return this.fetchWithError(`/generate/${encodeURIComponent(puzzleId)}/tried`, {
+      method: 'POST',
+      body: JSON.stringify({ userId, completed })
+    });
   }
 
   // Get a specific puzzle by ID

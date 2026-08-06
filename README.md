@@ -76,14 +76,30 @@ NODE_ENV=development
 
 ### Development Setup
 
-1. **Start the backend server**
+Before the first Lean-enabled run, install the pinned Mathlib cache:
+
+```bash
+cd lean-worker
+npm run setup
+```
+
+Put `OPENAI_API_KEY` only in `server/.env`; never use a `VITE_` prefix for secrets. The default model is configurable with `OPENAI_MODEL`.
+
+1. **Start the complete development stack**
+```bash
+npm run dev:fullstack
+```
+
+This starts the frontend, backend, and local Lean worker. Alternatively, start each process separately as described below.
+
+2. **Start the backend server**
 ```bash
 cd server
 npm start
 ```
 The server will run on `http://localhost:5000`
 
-2. **Start the frontend development server**
+3. **Start the frontend development server**
 ```bash
 # In the root directory
 npm run dev
