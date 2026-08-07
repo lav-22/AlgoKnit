@@ -1,5 +1,5 @@
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
-export const CATEGORIES = ['big-o', 'induction', 'set-theory', 'recursion', 'logic', 'combinatorics', 'graph-theory'];
+export const CATEGORIES = ['big-o', 'induction', 'set-theory', 'recursion', 'logic', 'combinatorics', 'graph-theory', 'data-structures'];
 
 export const BLOCK_LIMITS = {
   easy: { min: 4, max: 7 },

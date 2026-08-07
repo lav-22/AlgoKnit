@@ -7,13 +7,13 @@ const ProofTypeSelector = ({
   disabled = false 
 }) => {
   const proofTypes = [
-    { value: 'big-o', label: 'Big O' },
     { value: 'induction', label: 'Induction' },
     { value: 'set-theory', label: 'Set Theory' },
     { value: 'recursion', label: 'Recursion' },
     { value: 'logic', label: 'Logic' },
     { value: 'combinatorics', label: 'Combinatorics' },
-    { value: 'graph-theory', label: 'Graph Theory' }
+    { value: 'graph-theory', label: 'Graph Theory' },
+    { value: 'data-structures', label: 'Data Structures' }
   ];
 
   const handleProofTypeClick = (proofType) => {

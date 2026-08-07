@@ -11,11 +11,49 @@ const renderLatex = (latex, element, displayMode = false) => {
   });
 };
 
+const normalizeLatexInput = (value) => String(value ?? '')
+  // Values returned through JSON can occasionally be escaped twice.
+  .replace(/\\\\(?=[()[\]])/g, '\\');
+
+const escapeKatexText = (value) => value
+  .replace(/\\/g, '\\textbackslash{}')
+  .replace(/([{}%#$&_])/g, '\\$1');
+
+const hasUndelimitedMath = (content) => /\\(?:bigl|bigr|Bigl|Bigr|land|lor|neg|to|rightarrow|leftrightarrow|in|notin|subset|subseteq|setminus|cup|cap|forall|exists|frac|sqrt|sum|mathbb|Theta|Omega)\b|[∧∨¬→↔∈∉⊂⊆∪∩∀∃≤≥≠]/.test(content);
+
+// Convert old cached strings such as
+// "From h, obtain P \\to R by \\to E" into one KaTeX expression while
+// keeping normal English upright and spaced correctly.
+const prepareUndelimitedLatex = (content) => content
+  .split(/(\s+)/)
+  .map((token) => {
+    if (/^\s+$/.test(token)) return '\\;';
+    if (/^[A-Za-z][A-Za-z'-]{1,}[,.;!?]?$/.test(token)) {
+      const punctuation = token.match(/[,.;!?]$/)?.[0] || '';
+      const word = punctuation ? token.slice(0, -1) : token;
+      return `\\text{${escapeKatexText(word)}}${punctuation}`;
+    }
+    return token;
+  })
+  .join('');
+
 const appendText = (container, text) => {
   if (!text) return;
   const span = document.createElement('span');
   span.className = 'katex-prose';
   span.textContent = text;
+  container.appendChild(span);
+};
+
+const appendProseOrBareMath = (container, content) => {
+  if (!content) return;
+  if (!hasUndelimitedMath(content)) {
+    appendText(container, content);
+    return;
+  }
+  const span = document.createElement('span');
+  span.className = 'katex-math';
+  renderLatex(prepareUndelimitedLatex(content), span);
   container.appendChild(span);
 };
 
@@ -36,7 +74,7 @@ const renderDelimitedContent = (content, container) => {
     if (/^(\\\[[\s\S]*\\\]|\\\([\s\S]*\\\)|\$\$[\s\S]*\$\$|\$(?!\$)[^$]+\$)$/.test(token)) {
       appendMath(container, token);
     } else {
-      appendText(container, token);
+      appendProseOrBareMath(container, token);
     }
   });
 };
@@ -139,7 +177,7 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
         // Render ordinary prose normally and only send delimited mathematics to
         // KaTeX. Rendering an entire English sentence as math removes spaces,
         // italicises the words, and displays parse failures in red.
-        let processedLatex = latex;
+        let processedLatex = normalizeLatexInput(latex);
         
         // Replace placeholders with their selected values
         placeholders.forEach((match, index) => {
@@ -152,6 +190,8 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
         containerRef.current.innerHTML = '';
         if (hasMathDelimiters(processedLatex)) {
           renderDelimitedContent(processedLatex, containerRef.current);
+        } else if (hasUndelimitedMath(processedLatex)) {
+          renderLatex(prepareUndelimitedLatex(processedLatex), containerRef.current);
         } else if (isLegacyLatex(processedLatex)) {
           renderLatex(processedLatex, containerRef.current);
         } else {

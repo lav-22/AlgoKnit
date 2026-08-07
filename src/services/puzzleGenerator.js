@@ -365,7 +365,7 @@ class PuzzleGenerator {
     }
 
     // Validate category
-    const validCategories = ['big-o', 'induction', 'set-theory', 'recursion', 'logic', 'combinatorics', 'graph-theory'];
+    const validCategories = ['big-o', 'induction', 'set-theory', 'recursion', 'logic', 'combinatorics', 'graph-theory', 'data-structures'];
     if (!validCategories.includes(puzzle.category)) {
       throw new Error(`Invalid category: ${puzzle.category}. Must be one of: ${validCategories.join(', ')}`);
     }

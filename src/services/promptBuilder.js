@@ -19,7 +19,7 @@ OUTPUT FORMAT:
   "displayTitle": "Plain text title for UI display",
   "statement": "LaTeX-formatted problem statement",
   "difficulty": "easy|medium|hard",
-  "category": "big-o|induction|set-theory|recursion|logic|combinatorics|graph-theory",
+  "category": "big-o|induction|set-theory|recursion|logic|combinatorics|graph-theory|data-structures",
   "tags": ["array", "of", "relevant", "tags"],
   "blocks": [
     {
@@ -177,6 +177,9 @@ TOPIC IDEAS:
         case 'graph-theory':
           guidance += '\n- For Graph Theory proofs: Include graph properties, connectivity, and structural analysis';
           break;
+        case 'data-structures':
+          guidance += '\n- For Data Structures proofs: Prove an invariant or correctness property for heaps, stacks, queues, linked lists, trees, Dijkstra, or Bellman-Ford; state all preconditions explicitly';
+          break;
       }
     }
     
@@ -208,7 +211,7 @@ TOPIC IDEAS:
     }
     
     // Normalize proof types with intelligent defaults (Requirement 13.12)
-    const validProofTypes = ['big-o', 'induction', 'set-theory', 'recursion', 'logic', 'combinatorics', 'graph-theory'];
+    const validProofTypes = ['big-o', 'induction', 'set-theory', 'recursion', 'logic', 'combinatorics', 'graph-theory', 'data-structures'];
     let normalizedProofTypes = [];
     
     if (Array.isArray(proofTypes) && proofTypes.length > 0) {
@@ -244,7 +247,8 @@ TOPIC IDEAS:
       'Recursion': 'recursion',
       'Logic': 'logic',
       'Combinatorics': 'combinatorics',
-      'Graph Theory': 'graph-theory'
+      'Graph Theory': 'graph-theory',
+      'Data Structures': 'data-structures'
     };
     
     return displayLabels.map(label => labelMap[label] || label.toLowerCase().replace(/\s+/g, '-'));

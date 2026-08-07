@@ -223,6 +223,7 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, onPuzzleTried }) =>
                     key={block.id}
                     id={block.id}
                     latexContent={block.latex}
+                    pedagogicalRole={block.pedagogicalRole}
                     isInWorkspace={false}
                     blockSelections={blockSelections[block.id] || {}}
                     onSelectionChange={handleSelectionChange}
@@ -245,6 +246,7 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, onPuzzleTried }) =>
                     <ProofBlock
                       id={block.id}
                       latexContent={block.latex}
+                      pedagogicalRole={block.pedagogicalRole}
                       isInWorkspace={true}
                       blockSelections={blockSelections[block.id] || {}}
                       onSelectionChange={handleSelectionChange}
@@ -272,7 +274,12 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, onPuzzleTried }) =>
       {/* DragOverlay provides a smoother visual drag experience */}
       <DragOverlay dropAnimation={null}>
         {activeId && activeBlock ? (
-          <ProofBlock id={activeBlock.id} latexContent={activeBlock.latex} isOverlay={true} />
+          <ProofBlock
+            id={activeBlock.id}
+            latexContent={activeBlock.latex}
+            pedagogicalRole={activeBlock.pedagogicalRole}
+            isOverlay={true}
+          />
         ) : null}
       </DragOverlay>
     </DndContext>
