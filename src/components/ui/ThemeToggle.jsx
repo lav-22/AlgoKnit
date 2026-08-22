@@ -25,7 +25,7 @@ export default function ThemeToggle({ theme, onToggle }) {
       }}
     >
       <span style={{ fontSize: 14 }}>
-        {isDark ? "🌙 Dark" : "☀️ Light"}
+        {isDark ? "☀️ Light" : "🌙 Dark" }
       </span>
     </button>
   );

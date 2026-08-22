@@ -60,9 +60,9 @@ export default function StudentPage() {
             style={{
               padding: "10px 14px",
               borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.14)",
-              background: submode === SUBMODES.PRACTICE ? "rgba(56,189,248,0.14)" : "rgba(255,255,255,0.06)",
-              color: submode === SUBMODES.PRACTICE ? "rgba(56,189,248,1)" : "rgba(255,255,255,0.9)",
+              border: submode === SUBMODES.PRACTICE ? "1px solid rgba(56,189,248,0.5)" : "1px solid var(--color-border-default)",
+              background: submode === SUBMODES.PRACTICE ? "rgba(56,189,248,0.14)" : "var(--color-canvas-subtle)",
+              color: submode === SUBMODES.PRACTICE ? "rgba(56,189,248,1)" :    "var(--color-fg-default)",
               cursor: "pointer",
               fontWeight: 700,
             }}
@@ -76,9 +76,9 @@ export default function StudentPage() {
             style={{
               padding: "10px 14px",
               borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.14)",
-              background: submode === SUBMODES.CHALLENGE ? "rgba(56,189,248,0.14)" : "rgba(255,255,255,0.06)",
-              color: submode === SUBMODES.CHALLENGE ? "rgba(56,189,248,1)" : "rgba(255,255,255,0.9)",
+              border: submode === SUBMODES.PRACTICE ? "1px solid rgba(56,189,248,0.5)" : "1px solid var(--color-border-default)",
+              background: submode === SUBMODES.CHALLENGE ? "rgba(56,189,248,0.14)" : "var(--color-canvas-subtle)",
+              color: submode === SUBMODES.CHALLENGE ? "rgba(56,189,248,1)" : "var(--color-fg-default)",
               cursor: "pointer",
               fontWeight: 700,
             }}

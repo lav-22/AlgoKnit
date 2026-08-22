@@ -578,13 +578,13 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
                   marginLeft: 8,
                   background:
                     (isLockoutMode && isLocked) || (isLimitedMovesMode && movesFinished)
-                      ? 'rgba(255,255,255,0.05)'
-                      : 'rgba(34,197,94,0.18)',
-                  border: '1px solid rgba(255,255,255,0.14)',
+                      ? 'var(--color-canvas-subtle)'
+                      : '#15803d',
+                  border: '1px solid var(--color-border-default)',
                   color:
                     (isLockoutMode && isLocked) || (isLimitedMovesMode && movesFinished)
-                      ? 'rgba(255,255,255,0.45)'
-                      : 'rgba(255,255,255,0.92)',
+                      ? 'var(--color-fg-muted)'
+                      : '#ffffff',
                   cursor:
                     (isLockoutMode && isLocked) || (isLimitedMovesMode && movesFinished)
                       ? 'not-allowed'
@@ -606,7 +606,7 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
                 borderRadius: 10,
                 border: '1px solid rgba(248,113,113,0.55)',
                 background: 'rgba(248,113,113,0.12)',
-                color: 'rgba(255,255,255,0.95)',
+                color: 'var(--color-fg-default)',
                 fontSize: 14,
                 lineHeight: 1.35,
               }}
@@ -657,7 +657,7 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
                 background: (isLockoutMode && isLocked)
                   ? 'rgba(248,113,113,0.10)'
                   : 'rgba(56,189,248,0.08)',
-                color: 'rgba(255,255,255,0.9)',
+                color: 'var(--color-fg-default)',
                 fontSize: 14,
                 lineHeight: 1.35,
               }}
@@ -702,9 +702,9 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
                 marginTop: 10,
                 padding: '10px 12px',
                 borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.14)',
-                background: 'rgba(255,255,255,0.06)',
-                color: 'rgba(255,255,255,0.9)',
+                border: '1px solid var(--color-border-default)',
+                background: 'var(--color-canvas-subtle)',
+                color: 'var(--color-fg-default)',
                 fontSize: 14,
                 lineHeight: 1.35,
               }}
