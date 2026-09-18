@@ -10,21 +10,20 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/parsonspuzzle';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // Function to load JSON puzzle data
 function loadPuzzleData() {
   const puzzleDataPath = path.join(__dirname, '../../src/puzzles/data');
-  
   const bigOData = JSON.parse(fs.readFileSync(path.join(puzzleDataPath, 'big-o-proofs.json'), 'utf8'));
   const inductionData = JSON.parse(fs.readFileSync(path.join(puzzleDataPath, 'induction-proofs.json'), 'utf8'));
   const setTheoryData = JSON.parse(fs.readFileSync(path.join(puzzleDataPath, 'set-theory-proofs.json'), 'utf8'));
   const recursionData = JSON.parse(fs.readFileSync(path.join(puzzleDataPath, 'recursion-proofs.json'), 'utf8'));
 
   return {
-    'big-o': bigOData.puzzles,
+    bigO: bigOData.puzzles,
     induction: inductionData.puzzles,
-    'set-theory': setTheoryData.puzzles,
+    setTheory: setTheoryData.puzzles,
     recursion: recursionData.puzzles
   };
 }
