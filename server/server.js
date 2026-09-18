@@ -13,20 +13,21 @@ import {
 } from './services/database.js';
 
 const app = express();
-const PORT = Number(process.env.PORT || 5001);
-const ASSISTANT_NAME = process.env.OPENAI_ASSISTANT_NAME || 'Astra';
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-6-astra';
+const PORT = Number(process.env.PORT);
+const ASSISTANT_NAME = process.env.OPENAI_ASSISTANT_NAME;
+const OPENAI_MODEL = process.env.OPENAI_MODEL;
 
 // Security middleware
 app.use(helmet());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
-  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 100),
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS),
+  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS),
   skip: req => req.path === '/api/health',
   message: 'Too many requests from this IP, please try again later.'
 });
+
 app.use(limiter);
 
 // Middleware
@@ -84,7 +85,7 @@ app.use((req, res) => {
 
 const server = app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
   console.log(`OpenAI assistant: ${ASSISTANT_NAME} (${OPENAI_MODEL})`);
   void connectDatabase();
 });
