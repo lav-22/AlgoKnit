@@ -19,7 +19,7 @@ class MockOpenAIService {
     return null;
   }
 
-  async generatePuzzle(prompt) {
+  async generatePuzzle() {
     // Return a mock response that simulates OpenAI API
     return `{
       "title": "Mathematical Induction Proof",
@@ -103,9 +103,9 @@ async function testIntegration() {
     console.log('\n🔍 Validation Results');
     console.log('=====================');
     
-    // Check block count is within range (8-12)
-    const blockCountValid = puzzle.blocks.length >= 8 && puzzle.blocks.length <= 12;
-    console.log('Block count valid (8-12):', blockCountValid);
+    const limits = { easy: [4, 7], medium: [7, 10], hard: [9, 12] }[puzzle.difficulty];
+    const blockCountValid = puzzle.blocks.length >= limits[0] && puzzle.blocks.length <= limits[1];
+    console.log(`Block count valid (${limits[0]}-${limits[1]}):`, blockCountValid);
     
     // Check all required fields are present
     const requiredFields = ['id', 'title', 'displayTitle', 'statement', 'difficulty', 'category', 'tags', 'blocks', 'solutionOrder', 'createdAt', 'isActive'];
@@ -126,7 +126,7 @@ async function testIntegration() {
       console.log('\n🎉 Integration test PASSED!');
       console.log('All requirements satisfied:');
       console.log('✓ Parse OpenAI response and extract puzzle components');
-      console.log('✓ Validate puzzle has 8-12 proof blocks as required');
+      console.log('✓ Validate puzzle has the required difficulty-specific block count');
       console.log('✓ Assign unique IDs to blocks and generate solution order');
       console.log('✓ Handle malformed responses with descriptive error messages');
       return true;

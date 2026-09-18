@@ -70,7 +70,7 @@ cp .env.example .env
 # MONGODB_URI=mongodb://localhost:27017/parsonspuzzle  # Local MongoDB
 # or
 # MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/parsonspuzzle  # MongoDB Atlas
-PORT=5000
+PORT=5001
 NODE_ENV=development
 ```
 
@@ -97,7 +97,7 @@ This starts the frontend, backend, and local Lean worker. Alternatively, start e
 cd server
 npm start
 ```
-The server will run on `http://localhost:5000`
+The server will run on `http://localhost:5001`
 
 3. **Start the frontend development server**
 ```bash
@@ -193,7 +193,7 @@ server/
 **Server (.env)**
 ```env
 MONGODB_URI=mongodb://localhost:27017/parsonspuzzle
-PORT=5000
+PORT=5001
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 ```
@@ -398,7 +398,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions, issues, or contributions:
 - Create an issue on GitHub
-- Check the [Educator Guide](EDUCATOR_GUIDE.md) for detailed usage instructions
+- Check the [Educator Guide](guides/EDUCATOR_GUIDE.md) for detailed usage instructions
 - Review the existing documentation and code comments
 
 ---

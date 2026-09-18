@@ -31,7 +31,7 @@ OUTPUT FORMAT:
 }
 
 RULES:
-1. Generate exactly 8-12 proof blocks (no more, no less)
+1. Follow the difficulty-specific proof-block limits below
 2. Each block must be a self-contained logical step
 3. Use valid LaTeX syntax for all mathematical notation
 4. Proofs must be logically complete and mathematically valid
@@ -84,7 +84,7 @@ TOPIC IDEAS:
       case 'easy':
         difficultySection += `
 - Use fundamental concepts and basic mathematical operations
-- Limit to 3-7 proof blocks for shorter, more manageable proofs
+- Limit to 4-7 proof blocks for shorter, more manageable proofs
 - Focus on direct proof techniques and simple logical steps
 - Avoid complex nested reasoning or advanced mathematical concepts
 - Use clear, straightforward mathematical notation
@@ -94,7 +94,7 @@ TOPIC IDEAS:
       case 'medium':
         difficultySection += `
 - Use intermediate mathematical concepts and standard proof techniques
-- Target 7-11 proof blocks for moderate complexity
+- Target 7-10 proof blocks for moderate complexity
 - Include some multi-step reasoning and standard mathematical arguments
 - Balance between accessibility and mathematical rigor
 - Use standard mathematical notation and common proof patterns
@@ -104,7 +104,7 @@ TOPIC IDEAS:
       case 'hard':
         difficultySection += `
 - Use advanced mathematical concepts and sophisticated proof techniques
-- Target 10-12 proof blocks for complex, multi-layered arguments
+- Target 9-12 proof blocks for complex, multi-layered arguments
 - Include intricate logical reasoning and advanced mathematical methods
 - Require deep mathematical insight and careful logical analysis
 - Use sophisticated mathematical notation and advanced proof strategies

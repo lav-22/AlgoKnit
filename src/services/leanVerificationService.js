@@ -131,7 +131,7 @@ class LeanVerificationService {
    * Returns success for all valid puzzle structures
    * @private
    */
-  async _placeholderVerification(puzzle) {
+  async _placeholderVerification() {
     // Simulate verification processing time
     await new Promise(resolve => setTimeout(resolve, 100));
 

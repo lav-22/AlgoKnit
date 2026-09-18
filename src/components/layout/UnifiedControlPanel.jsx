@@ -17,8 +17,7 @@ const UnifiedControlPanel = ({
   onProofTypesChange,
   onGeneratePuzzle,
   isGenerating = false,
-  generationError = null,
-  generatedPuzzle = null
+  generationError = null
 }) => {
   return (
     <div className={styles.unifiedControlPanelWrapper}>

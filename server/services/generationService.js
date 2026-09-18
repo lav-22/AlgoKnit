@@ -6,15 +6,15 @@ import leanClient from './leanClient.js';
 import { buildPuzzlePrompt } from './promptBuilder.js';
 import { normalizeGenerationRequest, validateCandidate } from './puzzleContract.js';
 
-const MAX_REPAIR_ATTEMPTS = Number(process.env.OPENAI_REPAIR_ATTEMPTS || 2);
+const OPENAI_FORMAT_ERROR_CODES = new Set(['OPENAI_EMPTY_RESPONSE', 'OPENAI_INVALID_JSON']);
 
 function candidateRepairDiagnostics(error, candidate) {
   const blocks = Array.isArray(candidate?.blocks)
     ? candidate.blocks.map(({ id, latex, pedagogicalRole }) => ({ id, latex, pedagogicalRole }))
     : [];
   return [
-    'The previous response was a proof plan rather than a complete natural-deduction proof.',
-    'Convert it into a complete formal natural-deduction proof. Use the exact assumptions and inference rules, and do not skip any steps.',
+    'The previous response failed the Parsons puzzle application contract.',
+    'Return a complete formal natural-deduction proof with the exact assumptions and inference rules, and do not skip any steps.',
     `Validation error: ${error.message}`,
     `Previous blocks to replace: ${JSON.stringify(blocks)}`
   ].join('\n').slice(0, 3000);
@@ -58,22 +58,36 @@ export class GenerationService {
   }
 
   async generate(body) {
+    const maxRepairAttempts = Number(process.env.OPENAI_REPAIR_ATTEMPTS || 2);
     const request = normalizeGenerationRequest(body);
     const cached = await this.findUnseen(request);
     if (cached) { await this.recordSeen(request.userId, cached.id); return safePuzzle(cached, 'cache'); }
 
-    let diagnostics = null; let lastVerification = null;
-    for (let attempt = 0; attempt <= MAX_REPAIR_ATTEMPTS; attempt++) {
+    let diagnostics = null;
+    let lastVerification = null;
+    let improperlyFormattedAttemptCount = 0;
+    let leanRejectedAttemptCount = 0;
+    for (let attempt = 0; attempt <= maxRepairAttempts; attempt++) {
       const prompt = buildPuzzlePrompt(request, diagnostics);
-      const generated = await this.openai.generate(prompt, {
-        ...request,
-        requestId: `${request.requestId}:attempt:${attempt}`
-      });
+      let generated;
+      try {
+        generated = await this.openai.generate(prompt, {
+          ...request,
+          requestId: `${request.requestId}:attempt:${attempt}`
+        });
+      } catch (error) {
+        if (!OPENAI_FORMAT_ERROR_CODES.has(error.code)) throw error;
+        improperlyFormattedAttemptCount += 1;
+        if (attempt >= maxRepairAttempts) throw error;
+        diagnostics = candidateRepairDiagnostics(error, null);
+        continue;
+      }
       let candidate;
       try {
         candidate = validateCandidate(generated.candidate, request);
       } catch (error) {
-        if (error.code === 'PROOF_PLAN_DETECTED' && attempt < MAX_REPAIR_ATTEMPTS) {
+        improperlyFormattedAttemptCount += 1;
+        if (attempt < maxRepairAttempts) {
           diagnostics = candidateRepairDiagnostics(error, generated.candidate);
           continue;
         }
@@ -82,13 +96,29 @@ export class GenerationService {
       lastVerification = await this.lean.verify(candidate.lean);
       if (lastVerification.valid) {
         const id = `llm_${crypto.randomUUID()}`; const contentFingerprint = fingerprint(candidate);
-        const puzzleData = { ...candidate, id, source: 'llm-generated', contentFingerprint, verification: { ...lastVerification, status: 'verified', verifiedAt: new Date() }, generation: { model: generated.model, responseId: generated.responseId, promptVersion: '1.1', repairAttemptCount: attempt }, isActive: true };
+        const puzzleData = {
+          ...candidate,
+          id,
+          source: 'llm-generated',
+          contentFingerprint,
+          verification: { ...lastVerification, status: 'verified', verifiedAt: new Date() },
+          generation: {
+            model: generated.model,
+            responseId: generated.responseId,
+            promptVersion: '1.1',
+            repairAttemptCount: attempt,
+            improperlyFormattedAttemptCount,
+            leanRejectedAttemptCount,
+          },
+          isActive: true,
+        };
         let puzzle;
         try { puzzle = await this.Puzzle.create(puzzleData); }
         catch (error) { if (error.code !== 11000) throw error; puzzle = await this.Puzzle.findOne({ contentFingerprint }); }
         await this.recordSeen(request.userId, puzzle.id);
         return safePuzzle(puzzle, 'generated');
       }
+      if (lastVerification.status === 'rejected') leanRejectedAttemptCount += 1;
       diagnostics = JSON.stringify(lastVerification.diagnostics || []).slice(0, 3000);
     }
     throw Object.assign(new Error('No Lean-verified puzzle could be produced'), { status: lastVerification?.status === 'infrastructure_error' ? 503 : 422, code: 'LEAN_VERIFICATION_FAILED' });

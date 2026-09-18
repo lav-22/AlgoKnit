@@ -329,9 +329,15 @@ class PuzzleGenerator {
       throw new Error('Puzzle blocks must be an array');
     }
 
-    // Check block count (8-12 as per requirements)
-    if (puzzle.blocks.length < 8 || puzzle.blocks.length > 12) {
-      throw new Error(`Puzzle must have between 8 and 12 proof blocks. Got ${puzzle.blocks.length} blocks.`);
+    const blockLimits = {
+      easy: { min: 4, max: 7 },
+      medium: { min: 7, max: 10 },
+      hard: { min: 9, max: 12 }
+    };
+    const limits = blockLimits[puzzle.difficulty];
+    if (!limits || puzzle.blocks.length < limits.min || puzzle.blocks.length > limits.max) {
+      const expected = limits ? `${limits.min}-${limits.max}` : 'a valid difficulty-specific number of';
+      throw new Error(`Puzzle must have ${expected} proof blocks. Got ${puzzle.blocks.length} blocks.`);
     }
 
     // Validate each block has required properties

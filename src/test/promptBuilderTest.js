@@ -15,21 +15,21 @@ function testDifficultyInjection() {
   const easyPrompt = promptBuilder.createPuzzlePrompt({ difficulty: 'easy' });
   const hasEasyGuidance = easyPrompt.includes('DIFFICULTY LEVEL: EASY') && 
                          easyPrompt.includes('fundamental concepts') &&
-                         easyPrompt.includes('8-9 proof blocks');
+                         easyPrompt.includes('4-7 proof blocks');
   console.log('✓ Easy difficulty injection:', hasEasyGuidance ? 'PASS' : 'FAIL');
   
   // Test medium difficulty (default)
   const mediumPrompt = promptBuilder.createPuzzlePrompt({ difficulty: 'medium' });
   const hasMediumGuidance = mediumPrompt.includes('DIFFICULTY LEVEL: MEDIUM') &&
                            mediumPrompt.includes('intermediate mathematical concepts') &&
-                           mediumPrompt.includes('9-11 proof blocks');
+                           mediumPrompt.includes('7-10 proof blocks');
   console.log('✓ Medium difficulty injection:', hasMediumGuidance ? 'PASS' : 'FAIL');
   
   // Test hard difficulty
   const hardPrompt = promptBuilder.createPuzzlePrompt({ difficulty: 'hard' });
   const hasHardGuidance = hardPrompt.includes('DIFFICULTY LEVEL: HARD') &&
                          hardPrompt.includes('advanced mathematical concepts') &&
-                         hardPrompt.includes('10-12 proof blocks');
+                         hardPrompt.includes('9-12 proof blocks');
   console.log('✓ Hard difficulty injection:', hasHardGuidance ? 'PASS' : 'FAIL');
   
   return hasEasyGuidance && hasMediumGuidance && hasHardGuidance;
@@ -183,5 +183,5 @@ export { runPromptBuilderTests };
 
 // Run tests if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runPromptBuilderTests();
+  if (!runPromptBuilderTests()) process.exitCode = 1;
 }

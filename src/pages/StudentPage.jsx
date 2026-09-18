@@ -3,6 +3,7 @@ import { PuzzleDisplay, LeftControlPanel, LoadingState } from '../components';
 import { FloatingHelpButton, StatusIndicator } from '../components/ui';
 import { useAppState } from '../hooks/useAppState';
 import puzzleService from '../services/puzzleService.js';
+import { PuzzleLoader } from '../services/puzzleLoader.js';
 import { getStableUserId } from '../services/userIdentity.js';
 import styles from './StudentPage.module.css';
 
@@ -61,7 +62,6 @@ function StudentPage() {
           proofTypes: selectedProofTypes
         });
         
-        const { PuzzleLoader } = await import('../services/puzzleLoader.js');
         let filteredPuzzles = PuzzleLoader.getAllPuzzles();
         
         // Filter by difficulty

@@ -71,7 +71,9 @@ const puzzleSchema = new mongoose.Schema({
     model: String,
     responseId: String,
     promptVersion: String,
-    repairAttemptCount: { type: Number, default: 0 }
+    repairAttemptCount: { type: Number, default: 0, min: 0 },
+    improperlyFormattedAttemptCount: { type: Number, default: 0, min: 0 },
+    leanRejectedAttemptCount: { type: Number, default: 0, min: 0 }
   },
   useCount: { type: Number, default: 0 },
   lastServedAt: Date,

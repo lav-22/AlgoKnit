@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import katex from 'katex';
 
 const MATH_DELIMITER_PATTERN = /(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$(?!\$)[^$]+?\$)/g;
@@ -90,10 +90,38 @@ const isLegacyLatex = (content) => {
     || (!/\s/.test(trimmed) && /[\\^_={}]/.test(trimmed));
 };
 
+const getDropdownOptions = (type) => {
+  switch (type) {
+    case 'op':
+      return [
+        ['<', '<'], ['\\leq', '≤'], ['=', '='], ['\\geq', '≥'], ['>', '>'], ['\\neq', '≠']
+      ];
+    case 'quantifier':
+      return [
+        ['\\forall', '∀ (for all)'], ['\\exists', '∃ (exists)'],
+        ['\\exists!', '∃! (exactly one)'], ['\\nexists', '∄ (does not exist)']
+      ];
+    case 'set':
+    case 'setop':
+      return [
+        ['\\in', '∈ (element of)'], ['\\notin', '∉ (not element of)'],
+        ['\\subset', '⊂ (proper subset)'], ['\\subseteq', '⊆ (subset)'],
+        ['\\supset', '⊃ (proper superset)'], ['\\supseteq', '⊇ (superset)'],
+        ['\\emptyset', '∅ (empty set)']
+      ];
+    case 'logic':
+      return [['\\land', '∧ (and)'], ['\\lor', '∨ (or)'], ['\\neg', '¬ (not)']];
+    case 'complexity':
+      return [['O', 'O (upper bound)'], ['\\Omega', 'Ω (lower bound)'], ['\\Theta', 'Θ (tight bound)']];
+    default:
+      return [['', 'Select...']];
+  }
+};
+
 const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive = false, blockId = null }) => {
   const containerRef = useRef();
 
-  const createDropdown = (uniqueKey, currentValue, onChange) => {
+  const createDropdown = useCallback((uniqueKey, currentValue, onChange) => {
     const varType = uniqueKey.split('_')[0]; // Extract type from unique key
     const options = getDropdownOptions(varType);
     const select = document.createElement('select');
@@ -117,55 +145,9 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
     select.addEventListener('pointerdown', (e) => e.stopPropagation());
     
     return select;
-  };
+  }, []);
 
-  const getDropdownOptions = (type) => {
-    switch (type) {
-      case 'op':
-        return [
-          ['<', '<'],
-          ['\\leq', '≤'],
-          ['=', '='],
-          ['\\geq', '≥'],
-          ['>', '>'],
-          ['\\neq', '≠']
-        ];
-      case 'quantifier':
-        return [
-          ['\\forall', '∀ (for all)'],
-          ['\\exists', '∃ (exists)'],
-          ['\\exists!', '∃! (exactly one)'],
-          ['\\nexists', '∄ (does not exist)']
-        ];
-      case 'set':
-      case 'setop':
-        return [
-          ['\\in', '∈ (element of)'],
-          ['\\notin', '∉ (not element of)'],
-          ['\\subset', '⊂ (proper subset)'],
-          ['\\subseteq', '⊆ (subset)'],
-          ['\\supset', '⊃ (proper superset)'],
-          ['\\supseteq', '⊇ (superset)'],
-          ['\\emptyset', '∅ (empty set)']
-        ];
-      case 'logic':
-        return [
-          ['\\land', '∧ (and)'],
-          ['\\lor', '∨ (or)'],
-          ['\\neg', '¬ (not)']
-        ];
-      case 'complexity':
-        return [
-          ['O', 'O (upper bound)'],
-          ['\\Omega', 'Ω (lower bound)'],
-          ['\\Theta', 'Θ (tight bound)']
-        ];
-      default:
-        return [['', 'Select...']];
-    }
-  };
-
-  const renderMixedContent = () => {
+  const renderMixedContent = useCallback(() => {
     if (!containerRef.current || !latex) return;
 
     try {
@@ -251,11 +233,11 @@ const KatexRenderer = ({ latex, variables = {}, onVariableChange, isInteractive 
       console.error('KaTeX rendering error:', e);
       containerRef.current.textContent = latex;
     }
-  };
+  }, [createDropdown, isInteractive, latex, onVariableChange, variables]);
 
   useEffect(() => {
     renderMixedContent();
-  }, [latex, variables, isInteractive, blockId]);
+  }, [blockId, renderMixedContent]);
 
   return <span ref={containerRef} className="mixed-latex-content" />;
 };

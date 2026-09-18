@@ -4,14 +4,15 @@ This directory contains the OpenAI API integration services for LLM-powered puzz
 
 ## Services
 
-### 1. OpenAI Service (`openaiService.js`)
-- **Purpose**: Core OpenAI API client with authentication and error handling
+### 1. Secure OpenAI service (`server/services/openaiPuzzleService.js`)
+- **Purpose**: Server-side Responses API client used by `/api/generate`
 - **Features**:
-  - Environment variable handling for API key (`VITE_OPENAI_API_KEY`)
-  - 30-second timeout for API requests
+  - Server-only API key handling (`OPENAI_API_KEY`)
+  - Background-mode generation with polling for long-running requests
+  - Separate browser and OpenAI timeouts
   - Comprehensive error handling for different HTTP status codes (401, 429, 500)
-  - Secure API key management (not logged to console)
-  - Connection testing functionality
+  - GPT-6 Astra (`gpt-6-astra`)
+  - Structured JSON output and Lean verification before persistence
 
 ### 2. Prompt Builder (`promptBuilder.js`)
 - **Purpose**: Constructs structured prompts for puzzle generation
@@ -27,16 +28,40 @@ This directory contains the OpenAI API integration services for LLM-powered puzz
 - **Features**:
   - Complete puzzle generation workflow
   - Response parsing and validation
-  - Puzzle structure validation (8-12 blocks, required properties)
+  - Difficulty-specific block-count and structure validation
   - Metadata addition (ID, timestamps, source tracking)
   - Comprehensive error handling and validation
 
 ## Environment Configuration
 
-Create a `.env` file in the project root with:
+Create `server/.env` with:
 ```
-VITE_OPENAI_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_api_key_here
+OPENAI_ASSISTANT_NAME=Astra
+OPENAI_MODEL=gpt-6-astra
+OPENAI_SERVICE_TIER=auto
+OPENAI_BACKGROUND=true
+OPENAI_TIMEOUT_MS=300000
+OPENAI_POLL_INTERVAL_MS=2000
 ```
+
+Never put an OpenAI key in a `VITE_` variable. Vite variables are exposed to the browser.
+
+The frontend uses a 30-second timeout for ordinary API calls and a separate
+`VITE_GENERATION_TIMEOUT_MS` value (20 minutes by default) for generation. An uncached
+request can require one or more Astra generations followed by Lean compilation, so it
+must not use the ordinary API timeout.
+
+Every newly generated, Lean-verified puzzle stores these counters under its MongoDB
+`generation` object:
+
+- `improperlyFormattedAttemptCount`: Astra outputs that were empty, invalid JSON, or
+  rejected by the Parsons puzzle application contract before the successful output.
+- `leanRejectedAttemptCount`: structurally valid attempts that Lean rejected before
+  the successful proof. Lean worker timeouts and infrastructure errors are not counted
+  as proof rejections.
+- `repairAttemptCount`: total unsuccessful attempts before success, retained for
+  compatibility.
 
 ## Usage Example
 

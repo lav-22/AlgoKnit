@@ -1,26 +1,30 @@
+import 'dotenv/config';
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import puzzleRoutes from './routes/puzzles.js';
 import generationRoutes from './routes/generation.js';
-
-// Load environment variables
-dotenv.config();
+import {
+  connectDatabase,
+  databaseState,
+  isDatabaseConnected,
+  stopDatabase,
+} from './services/database.js';
 
 const app = express();
-const PORT = process.env.PORT || 5001;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/parsonspuzzle';
+const PORT = Number(process.env.PORT || 5001);
+const ASSISTANT_NAME = process.env.OPENAI_ASSISTANT_NAME || 'Astra';
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-6-astra';
 
 // Security middleware
 app.use(helmet());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
+  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS || 100),
+  skip: req => req.path === '/api/health',
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use(limiter);
@@ -54,7 +58,14 @@ app.use('/api/generate', generationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected', timestamp: new Date().toISOString() });
+  const connected = isDatabaseConnected();
+  res.status(connected ? 200 : 503).json({
+    status: connected ? 'OK' : 'STARTING',
+    database: databaseState(),
+    assistant: ASSISTANT_NAME,
+    model: OPENAI_MODEL,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Error handling middleware
@@ -71,69 +82,31 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Database connection with Windows-friendly SSL options
-const mongooseOptions = {
-  serverSelectionTimeoutMS: 5001, // Keep trying to send operations for 5 seconds
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  bufferCommands: false, // Disable mongoose buffering
-  maxPoolSize: 10, // Maintain up to 10 socket connections
-};
+const server = app.listen(PORT, () => {
+  console.log(`Server listening on http://localhost:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`OpenAI assistant: ${ASSISTANT_NAME} (${OPENAI_MODEL})`);
+  void connectDatabase();
+});
 
-// For Windows, add additional SSL options if needed
-if (process.platform === 'win32') {
-  mongooseOptions.tls = true;
-  mongooseOptions.tlsAllowInvalidCertificates = true;
-  // Note: Don't use tlsInsecure with tlsAllowInvalidCertificates
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Stop the existing backend before starting another one.`);
+  } else {
+    console.error('Backend server error:', error);
+  }
+  process.exit(1);
+});
+
+async function shutdown(signal) {
+  console.log(`${signal} received. Shutting down gracefully...`);
+  server.close(async () => {
+    await stopDatabase();
+    process.exit(0);
+  });
 }
 
-mongoose.connect(MONGODB_URI, mongooseOptions)
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`Platform: ${process.platform}`);
-    });
-  })
-  .catch((error) => {
-    console.error('Database connection error:', error);
-    console.log('Attempting fallback connection...');
-    
-    // Fallback connection attempt with even more relaxed settings
-    const fallbackOptions = {
-      ...mongooseOptions,
-      ssl: false, // Try without SSL as last resort
-      directConnection: false,
-    };
-    
-    mongoose.connect(MONGODB_URI.replace('mongodb+srv://', 'mongodb://'), fallbackOptions)
-      .then(() => {
-        console.log('Connected to MongoDB with fallback options');
-        app.listen(PORT, () => {
-          console.log(`Server running on port ${PORT} (fallback mode)`);
-        });
-      })
-      .catch((fallbackError) => {
-        console.error('Fallback connection also failed:', fallbackError);
-        console.log('Starting server without database connection...');
-        app.listen(PORT, () => {
-          console.log(`Server running on port ${PORT} (NO DATABASE)`);
-          console.log('Database connection will be retried automatically');
-        });
-      });
-  });
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
-  await mongoose.connection.close();
-  process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-  console.log('SIGINT received. Shutting down gracefully...');
-  await mongoose.connection.close();
-  process.exit(0);
-});
+process.on('SIGTERM', () => void shutdown('SIGTERM'));
+process.on('SIGINT', () => void shutdown('SIGINT'));
 
 export default app;

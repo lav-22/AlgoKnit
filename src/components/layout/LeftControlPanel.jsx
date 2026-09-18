@@ -86,7 +86,7 @@ const LeftControlPanel = ({
             checked={dataSource === 'smart'}
             onChange={() => onDataSourceChange('smart')}
           />
-          <span>Smart (MongoDB + OpenAI)</span>
+          <span>Astra (MongoDB + OpenAI)</span>
         </label>
       </div>
 

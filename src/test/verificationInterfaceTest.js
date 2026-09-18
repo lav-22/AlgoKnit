@@ -16,7 +16,7 @@ async function testInterface() {
     // If we can import it, the file exists in the right place
     console.log('✅ PASSED: Service exists at src/services/leanVerificationService.js');
     passed++;
-  } catch (error) {
+  } catch {
     console.log('❌ FAILED: Service not found at expected location');
     failed++;
   }

@@ -1,7 +1,7 @@
 const FORBIDDEN = /\b(sorry|admit|axiom|unsafe)\b/;
 
 export class LeanClient {
-  constructor({ endpoint = process.env.LEAN_VERIFY_URL || 'http://localhost:3001/verify', timeoutMs = Number(process.env.LEAN_TIMEOUT_MS || 10000), fetchImpl = fetch } = {}) {
+  constructor({ endpoint = process.env.LEAN_VERIFY_URL || 'http://localhost:3001/verify', timeoutMs = Number(process.env.LEAN_TIMEOUT_MS || 30000), fetchImpl = fetch } = {}) {
     this.endpoint = endpoint; this.timeoutMs = timeoutMs; this.fetchImpl = fetchImpl;
   }
 

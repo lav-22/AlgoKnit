@@ -1,8 +1,9 @@
 // OpenAI API service for puzzle generation
 class OpenAIService {
   constructor() {
-    // Handle both Vite environment and Node.js environment
-    this.apiKey = this.getApiKey();
+    // Direct browser calls are intentionally disabled so API keys never ship
+    // in the frontend bundle. Production generation uses /api/generate.
+    this.apiKey = null;
     this.baseURL = 'https://api.openai.com/v1';
     this.timeout = 30000; // 30 seconds as per requirements
   }
@@ -11,20 +12,6 @@ class OpenAIService {
    * Get API key from environment variables
    */
   getApiKey() {
-    // In Vite environment
-    try {
-      if (import.meta && import.meta.env) {
-        return import.meta.env.VITE_OPENAI_API_KEY;
-      }
-    } catch (e) {
-      // import.meta not available in Node.js
-    }
-    
-    // In Node.js environment
-    if (typeof process !== 'undefined' && process.env) {
-      return process.env.VITE_OPENAI_API_KEY;
-    }
-    
     return null;
   }
 
@@ -40,7 +27,7 @@ class OpenAIService {
    */
   getConfigurationError() {
     if (!this.apiKey) {
-      return 'OpenAI API key not configured. Please set VITE_OPENAI_API_KEY.';
+      return 'Direct browser OpenAI access is disabled. Use the secure /api/generate endpoint.';
     }
     return null;
   }

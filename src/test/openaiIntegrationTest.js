@@ -53,11 +53,12 @@ async function testOpenAIIntegration() {
     // This will fail due to no API key, but we can test the error handling
     await puzzleGenerator.generatePuzzle(testSelections);
   } catch (error) {
-    if (error.message.includes('OpenAI API key not configured')) {
+    if (error.message.includes('Direct browser OpenAI access is disabled')) {
       console.log('   ✓ Puzzle generator error handling works correctly');
       console.log(`   Error message: ${error.message}\n`);
     } else {
       console.log(`   Unexpected error: ${error.message}\n`);
+      process.exitCode = 1;
     }
   }
   
@@ -89,7 +90,7 @@ async function testOpenAIIntegration() {
   
   console.log('=== Integration Test Complete ===');
   console.log('All components are properly structured and handle errors correctly.');
-  console.log('To test with actual API calls, set VITE_OPENAI_API_KEY environment variable.');
+  console.log('Live OpenAI calls are tested through the secure backend /api/generate endpoint.');
 }
 
 // Export for use in other files

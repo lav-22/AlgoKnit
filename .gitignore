@@ -45,3 +45,4 @@ server/logs/
 *.njsproj
 *.sln
 *.sw?
+.vercel
