@@ -40,8 +40,8 @@ export class OpenAIPuzzleService {
 
   async generate(prompt, { userId, requestId } = {}) {
     const apiKey = this.apiKey || process.env.OPENAI_API_KEY;
-    const model = this.model || process.env.OPENAI_MODEL || 'gpt-6-astra';
-    const assistantName = process.env.OPENAI_ASSISTANT_NAME || 'Astra';
+    const model = this.model || process.env.OPENAI_MODEL;
+    const assistantName = process.env.OPENAI_ASSISTANT_NAME;
     const requestedTier = process.env.OPENAI_SERVICE_TIER || 'auto';
     const serviceTier = ALLOWED_SERVICE_TIERS.has(requestedTier) ? requestedTier : 'auto';
     const timeoutMs = Number(process.env.OPENAI_TIMEOUT_MS || 300000);

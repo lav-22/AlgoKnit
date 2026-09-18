@@ -33,7 +33,7 @@ From the repository root:
 npm --prefix server run migrate
 ```
 
-The script connects directly to MongoDB using `server/.env`; the HTTP backend need not be running. It reads the four files in `src/puzzles/data/` and assigns the database categories `bigO`, `induction`, `recursion`, and `setTheory`.
+The script connects directly to MongoDB using `server/.env`; the HTTP backend need not be running. It reads the four files in `src/puzzles/data/` and assigns the database categories `big-o`, `induction`, `recursion`, and `set-theory`.
 
 **Existing IDs are updated, not skipped.** The script replaces matching puzzle fields with bundled values, resets creation/update timestamps, and marks matching puzzles active. It does not delete unrelated puzzles. Back up a database containing edits you need to preserve before re-importing.
 
@@ -44,7 +44,7 @@ Inspect the output for individual puzzle errors. The current script can report c
 With the backend running, inspect:
 
 - http://localhost:5001/api/puzzles — first page of active puzzles; `pagination.total` gives the total count.
-- http://localhost:5001/api/puzzles/category/bigO — imported Big O puzzles.
+- http://localhost:5001/api/puzzles/category/big-o — imported Big O puzzles.
 
 Then open Student mode and check that database puzzles load. The frontend also has local bundled puzzles, so seeing a puzzle alone does not prove that the database import succeeded.
 
