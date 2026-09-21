@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PuzzleDisplay, LeftControlPanel, LoadingState } from '../components';
 import { FloatingHelpButton, StatusIndicator } from '../components/ui';
 import { useAppState } from '../hooks/useAppState';
@@ -7,13 +6,6 @@ import puzzleService from '../services/puzzleService.js';
 import { PuzzleLoader } from '../services/puzzleLoader.js';
 import { getStableUserId } from '../services/userIdentity.js';
 import styles from './StudentPage.module.css';
-=======
-import React, { useEffect, useState } from "react";
-import { PuzzleDisplay, UnifiedControlPanel, LoadingState } from "../components";
-import { FloatingHelpButton, StatusIndicator } from "../components/ui";
-import { useAppState } from "../hooks/useAppState";
-import styles from "./StudentPage.module.css";
->>>>>>> upstream/jenna_edit_fixed
 
 const SUBMODE_KEY = "student_submode";
 const SUBMODES = { PRACTICE: "practice", CHALLENGE: "challenge" };
@@ -29,7 +21,15 @@ export default function StudentPage() {
     toggleDataSource,
   } = useAppState();
 
-<<<<<<< HEAD
+  const [submode, setSubmode] = useState(() => {
+    const saved = localStorage.getItem(SUBMODE_KEY);
+    return saved === SUBMODES.CHALLENGE ? saved : SUBMODES.PRACTICE;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(SUBMODE_KEY, submode);
+  }, [submode]);
+
   // Puzzle generation state
   const [dataSource, setDataSource] = useState('smart');
   const [selectedDifficulty, setSelectedDifficulty] = useState('medium');
@@ -52,7 +52,7 @@ export default function StudentPage() {
   const handleDataSourceChange = (source) => {
     setDataSource(source);
     setGeneratedPuzzle(null); // Clear generated puzzle when switching sources
-    
+
     // Update the existing data source toggle if needed
     if (source === 'local' && !useLocalData) {
       toggleDataSource();
@@ -65,7 +65,7 @@ export default function StudentPage() {
     console.log('🎯 Generate button clicked!');
     setIsGenerating(true);
     setGenerationError(null);
-    
+
     try {
       if (dataSource === 'local') {
         // Local Database - filter from JSON files
@@ -73,40 +73,40 @@ export default function StudentPage() {
           difficulty: selectedDifficulty,
           proofTypes: selectedProofTypes
         });
-        
+
         let filteredPuzzles = PuzzleLoader.getAllPuzzles();
-        
+
         // Filter by difficulty
         if (selectedDifficulty) {
           filteredPuzzles = filteredPuzzles.filter(p => p.difficulty === selectedDifficulty);
         }
-        
+
         // Filter by proof types (categories)
         if (selectedProofTypes.length > 0) {
           filteredPuzzles = filteredPuzzles.filter(p => {
             // Check if puzzle's tags include any of the selected proof types
-            return selectedProofTypes.some(type => 
+            return selectedProofTypes.some(type =>
               p.tags.some(tag => tag.toLowerCase().includes(type.toLowerCase()))
             );
           });
         }
-        
+
         if (filteredPuzzles.length === 0) {
           setGenerationError('No puzzles found matching your criteria. Try different filters.');
           return;
         }
-        
+
         // Select random puzzle from filtered results
         const randomIndex = Math.floor(Math.random() * filteredPuzzles.length);
         const selectedPuzzle = filteredPuzzles[randomIndex];
-        
+
         console.log('🎉 Selected puzzle from local database:', {
           id: selectedPuzzle.id,
           title: selectedPuzzle.displayTitle,
           difficulty: selectedPuzzle.difficulty,
           tags: selectedPuzzle.tags
         });
-        
+
         setGeneratedPuzzle(selectedPuzzle);
       } else {
         const selectedPuzzle = await puzzleService.generatePuzzle({
@@ -117,7 +117,7 @@ export default function StudentPage() {
         });
         setGeneratedPuzzle(selectedPuzzle);
       }
-      
+
     } catch (error) {
       console.error('❌ Puzzle generation failed:', error);
       console.error('Error details:', {
@@ -153,31 +153,14 @@ export default function StudentPage() {
       console.warn('Unable to update puzzle history:', error.message);
     }
   };
-  
+
   // Handle loading state
-=======
-  const [submode, setSubmode] = useState(SUBMODES.PRACTICE);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(SUBMODE_KEY);
-    if (saved === SUBMODES.PRACTICE || saved === SUBMODES.CHALLENGE) setSubmode(saved);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(SUBMODE_KEY, submode);
-  }, [submode]);
-
->>>>>>> upstream/jenna_edit_fixed
   if (isLoading) {
     return <LoadingState title="Loading puzzles..." message="Connecting to database..." />;
   }
 
-<<<<<<< HEAD
   // Handle case where no puzzle is selected yet
   if (!displayPuzzle) {
-=======
-  if (!currentPuzzle) {
->>>>>>> upstream/jenna_edit_fixed
     return (
       <LoadingState
         title="No puzzles available"
@@ -187,7 +170,6 @@ export default function StudentPage() {
   }
 
   return (
-<<<<<<< HEAD
     <div className={styles['student-page-container']}>
       <LeftControlPanel
         dataSource={dataSource}
@@ -205,35 +187,13 @@ export default function StudentPage() {
         <header className={styles['page-header']}>
           <h1>Parsons Puzzles for Math Proofs</h1>
           <p>Practice formal mathematical proofs through interactive drag-and-drop puzzles</p>
-        </header>
+          {/* Practice and challenge share the selected puzzle source. */}
 
-        <main className={styles['main-content']}>
-          <PuzzleDisplay 
-            key={displayPuzzle.id} 
-            puzzle={displayPuzzle} 
-            onNextPuzzle={handleCustomNextPuzzle}
-            isLastPuzzle={false}
-            onPuzzleTried={handlePuzzleTried}
-          />
-        </main>
-
-        <StatusIndicator 
-          isUsingApi={isUsingApi} 
-          isLoading={isLoading || healthLoading}
-        />
-        <FloatingHelpButton />
-      </div>
-=======
-    <div className={styles["student-page"]}>
-      <header className={styles["page-header"]}>
-        <h1>Parsons Puzzles for Math Proofs</h1>
-        <p>Practice formal mathematical proofs through interactive drag-and-drop puzzles</p>
-
-        {/* Submodes */}
-        <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
           <button
             type="button"
             onClick={() => setSubmode(SUBMODES.PRACTICE)}
+            aria-pressed={submode === SUBMODES.PRACTICE}
             style={{
               padding: "10px 14px",
               borderRadius: 10,
@@ -250,10 +210,11 @@ export default function StudentPage() {
           <button
             type="button"
             onClick={() => setSubmode(SUBMODES.CHALLENGE)}
+            aria-pressed={submode === SUBMODES.CHALLENGE}
             style={{
               padding: "10px 14px",
               borderRadius: 10,
-              border: submode === SUBMODES.PRACTICE ? "1px solid rgba(56,189,248,0.5)" : "1px solid var(--color-border-default)",
+              border: submode === SUBMODES.CHALLENGE ? "1px solid rgba(56,189,248,0.5)" : "1px solid var(--color-border-default)",
               background: submode === SUBMODES.CHALLENGE ? "rgba(56,189,248,0.14)" : "var(--color-canvas-subtle)",
               color: submode === SUBMODES.CHALLENGE ? "rgba(56,189,248,1)" : "var(--color-fg-default)",
               cursor: "pointer",
@@ -263,36 +224,25 @@ export default function StudentPage() {
             Challenge Mode
           </button>
         </div>
-      </header>
+        </header>
 
-      <UnifiedControlPanel
-        isUsingApi={isUsingApi}
-        puzzles={puzzles}
-        currentPuzzle={currentPuzzle}
-        useLocalData={useLocalData}
-        onToggleDataSource={toggleDataSource}
-        onPuzzleChange={handlePuzzleChange}
-        healthLoading={healthLoading}
-        puzzlesError={puzzlesError}
-      />
+        <main className={styles['main-content']}>
+          <PuzzleDisplay
+            key={`${displayPuzzle.id}:${submode}`}
+            puzzle={displayPuzzle}
+            mode={submode}
+            onNextPuzzle={handleCustomNextPuzzle}
+            isLastPuzzle={false}
+            onPuzzleTried={handlePuzzleTried}
+          />
+        </main>
 
-      <main className={styles["main-content"]}>
-        <PuzzleDisplay
-          key={`${currentPuzzle.id}:${submode}`}
-          puzzle={currentPuzzle}
-          onNextPuzzle={handleNextPuzzle}
-          isLastPuzzle={isLastPuzzle}
-          mode={submode} // <<< IMPORTANT
+        <StatusIndicator
+          isUsingApi={isUsingApi}
+          isLoading={isLoading || healthLoading}
         />
-      </main>
-
-      <StatusIndicator isUsingApi={isUsingApi} isLoading={isLoading || healthLoading} />
-      <FloatingHelpButton />
->>>>>>> upstream/jenna_edit_fixed
+        <FloatingHelpButton />
+      </div>
     </div>
   );
 }
-
-
-
-

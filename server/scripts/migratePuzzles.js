@@ -128,6 +128,7 @@ async function migratePuzzles() {
         };
         
         allPuzzles.push(puzzleData);
+      
       }
     }
     

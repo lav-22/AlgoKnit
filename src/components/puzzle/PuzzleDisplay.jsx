@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef } from 'react';
-=======
-import React, { useEffect, useMemo, useState } from 'react';
->>>>>>> upstream/jenna_edit_fixed
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   DndContext,
   PointerSensor,
@@ -24,9 +20,24 @@ import ProofValidationDisplay from './ProofValidationDisplay';
 import { KatexRenderer } from '../renderers';
 import './PuzzleDisplay.css';
 
-<<<<<<< HEAD
-const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, onPuzzleTried }) => {
-=======
+  const PaletteDroppable = ({ children }) => {
+    const { setNodeRef } = useDroppable({ id: 'palette' });
+    return (
+      <div ref={setNodeRef} className="puzzle-palette droppable-area">
+        {children}
+      </div>
+    );
+  };
+
+  const WorkspaceDroppable = ({ children }) => {
+    const { setNodeRef } = useDroppable({ id: 'workspace' });
+    return (
+      <div ref={setNodeRef} className="puzzle-workspace droppable-area">
+        {children}
+      </div>
+    );
+  };
+
 // Lockout challenge rules
 const MAX_CONSEC_WRONG = 5;
 const LOCK_SECONDS = 10;
@@ -37,7 +48,7 @@ const TIMED_SECONDS = 10;
 // ✅ NEW: Limited-moves rule
 const MAX_MOVES = 20;
 
-const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }) => {
+const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, onPuzzleTried, mode = 'practice' }) => {
   const isChallenge = mode === 'challenge';
 
   // internal sub-mode selector in challenge
@@ -46,7 +57,6 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
   const isTimedMode = isChallenge && challengeModeType === 'timed';
   const isLimitedMovesMode = isChallenge && challengeModeType === 'limited'; // ✅ NEW
 
->>>>>>> upstream/jenna_edit_fixed
   const [availableBlocks, setAvailableBlocks] = useState([]);
   const [proofBlocks, setProofBlocks] = useState([]);
   const [activeId, setActiveId] = useState(null);
@@ -115,11 +125,8 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
       const shuffledBlocks = [...puzzle.blocks].sort(() => Math.random() - 0.5);
       setAvailableBlocks(shuffledBlocks);
       setProofBlocks([]);
-<<<<<<< HEAD
-      setBlockSelections({}); // Reset selections when puzzle changes
-      triedReported.current = false;
-=======
       setBlockSelections({});
+      triedReported.current = false;
       setActiveId(null);
 
       setRevealResults(!isChallenge);
@@ -162,7 +169,6 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
       } else {
         setLockedUntil(null);
       }
->>>>>>> upstream/jenna_edit_fixed
     }
   }, [puzzle, isChallenge, isLockoutMode, challengeStorageKey, challengeModeType]);
 
@@ -460,24 +466,6 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
         return next;
       });
     }
-  };
-
-  const PaletteDroppable = ({ children }) => {
-    const { setNodeRef } = useDroppable({ id: 'palette' });
-    return (
-      <div ref={setNodeRef} className="puzzle-palette droppable-area">
-        {children}
-      </div>
-    );
-  };
-
-  const WorkspaceDroppable = ({ children }) => {
-    const { setNodeRef } = useDroppable({ id: 'workspace' });
-    return (
-      <div ref={setNodeRef} className="puzzle-workspace droppable-area">
-        {children}
-      </div>
-    );
   };
 
   const activeBlock = activeId ? getBlockById(activeId) : null;
@@ -798,16 +786,6 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Validation Display */}        <ProofValidationDisplay 
-          puzzle={puzzle}
-          proofBlocks={proofBlocks}
-          onReset={handleReset}
-          onNextPuzzle={onNextPuzzle}
-          isLastPuzzle={isLastPuzzle}
-          onPuzzleTried={onPuzzleTried}
-        />
-=======
         {!isChallenge && (
           <ProofValidationDisplay
             puzzle={puzzle}
@@ -815,9 +793,9 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
             onReset={handleReset}
             onNextPuzzle={onNextPuzzle}
             isLastPuzzle={isLastPuzzle}
+            onPuzzleTried={onPuzzleTried}
           />
         )}
->>>>>>> upstream/jenna_edit_fixed
       </div>
 
       <DragOverlay dropAnimation={null}>
@@ -825,10 +803,7 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
           <ProofBlock
             id={activeBlock.id}
             latexContent={activeBlock.latex}
-<<<<<<< HEAD
             pedagogicalRole={activeBlock.pedagogicalRole}
-=======
->>>>>>> upstream/jenna_edit_fixed
             isOverlay={true}
           />
         ) : null}
@@ -838,13 +813,9 @@ const PuzzleDisplay = ({ puzzle, onNextPuzzle, isLastPuzzle, mode = 'practice' }
 };
 
 export default PuzzleDisplay;
-<<<<<<< HEAD
-=======
 
 //Challenge mode introduces structured constraints to encourage deeper reasoning and disciplined problem-solving. Lockout mode limits repeated incorrect submissions, prompting students to pause and reflect between attempts rather than relying on rapid trial-and-error. Timed mode imposes a time constraint that promotes fluency and retrieval of proof structure under pressure, similar to assessment conditions. Limited moves mode restricts the number of allowed actions, encouraging students to plan their proof carefully before manipulating steps, thereby shifting focus from exploratory dragging to deliberate, expert-like reasoning. Together, these modes assess complementary skills while discouraging brute-force strategies.
 
   //Lockout mode discourages repeated incorrect submissions by limiting how often students can retry, while limited moves mode discourages trial-and-error construction by restricting how many actions students can take. Together, they target different forms of unproductive problem-solving behavior.
 
     //Confirm submission ("Are you sure you want to submit?") in Lockout Mode to encourage reflection and avoid accidental lockouts
-
->>>>>>> upstream/jenna_edit_fixed

@@ -1,118 +1,100 @@
 .navigationHeader {
-  background: var(--color-canvas-subtle);
-  border-bottom: 1px solid var(--color-border-default);
-  padding: 0.75rem 0;
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: blur(8px);
+  background: var(--color-canvas-subtle);
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 .navContainer {
   max-width: 87.5rem;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 1rem 1.5rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .logo {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 0.25rem;
+  margin-right: auto;
+  text-decoration: none;
+  flex-shrink: 0;
 }
-
-.logo h2 {
-  margin: 0;
+.logo:hover { text-decoration: none; }
+.brandName {
   color: var(--color-accent-fg);
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
 }
-
 .subtitle {
   color: var(--color-fg-muted);
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.75rem;
   margin-left: 0.25rem;
 }
-
-.navTabs {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.navTab {
+.navTabs, .navActions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.5rem;
-  text-decoration: none;
+}
+.navActions {
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--color-border-default);
+}
+.navControl {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--color-border-default);
+  border-radius: 10px;
+  background: transparent;
   color: var(--color-fg-muted);
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
-
-.navTab:hover {
-  color: var(--color-fg-default);
+.navControl:hover {
   background: var(--color-canvas-default);
-  border-color: var(--color-border-default);
+  color: var(--color-fg-default);
+  border-color: var(--color-fg-muted);
   text-decoration: none;
 }
-
-.navTab.active {
+.navControl.active {
   color: var(--color-accent-fg);
-  background: var(--color-accent-subtle);
   border-color: var(--color-accent-fg);
+  background: var(--color-accent-subtle);
 }
-
-.navTab.active:hover {
-  color: var(--color-accent-fg);
-  background: var(--color-accent-muted);
+.navControl:focus-visible, .logo:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 3px;
 }
+.statusSlot:empty { display: none; }
 
-.tabIcon {
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
+@media (max-width: 1100px) {
+  .navContainer { flex-wrap: wrap; gap: 0.75rem; }
+  .logo { width: 100%; }
+  .navActions { margin-left: auto; padding-left: 0.75rem; }
 }
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .navContainer {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 0 0.5rem;
-  }
-  
-  .logo h2 {
-    font-size: 1.25rem;
-    text-align: center;
-  }
-  
-  .navTabs {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .navTab {
-    flex: 1;
-    justify-content: center;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
+@media (max-width: 600px) {
+  .navContainer { padding: 0.75rem 1rem; }
+  .brandName { font-size: 1.125rem; }
+  .navTabs { width: 100%; }
+  .navTabs .navControl { flex: 1; padding: 0 0.5rem; }
+  .navActions { width: 100%; margin: 0; padding: 0; border: 0; }
+  .navActions > a, .navActions > button { flex: 1; }
 }
-
-@media (max-width: 480px) {
-  .navTab span:not(.tabIcon) {
-    display: none;
-  }
-  
-  .tabIcon {
-    font-size: 1.3rem;
-  }
+@media (prefers-reduced-motion: reduce) {
+  .navControl { transition: none; }
 }

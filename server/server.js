@@ -13,6 +13,7 @@ import {
 } from './services/database.js';
 
 const app = express();
+const IS_VERCEL = Boolean(process.env.VERCEL);
 const PORT = Number(process.env.PORT);
 const ASSISTANT_NAME = process.env.OPENAI_ASSISTANT_NAME;
 const OPENAI_MODEL = process.env.OPENAI_MODEL;
@@ -35,7 +36,14 @@ const corsOptions = {
   origin(origin, callback) {
     if (!origin) return callback(null, true);
     if (process.env.NODE_ENV === 'production') {
-      return callback(null, origin === process.env.FRONTEND_URL);
+      const allowedOrigins = new Set([
+        process.env.FRONTEND_URL,
+        'https://algoknit.tech',
+        'https://www.algoknit.tech',
+        'https://algoknit.vercel.app',
+        process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+      ].filter(Boolean));
+      return callback(null, allowedOrigins.has(origin));
     }
     const isLocalDevelopmentOrigin = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
     return callback(isLocalDevelopmentOrigin ? null : new Error('Origin not allowed by CORS'), isLocalDevelopmentOrigin);
@@ -83,14 +91,14 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-const server = app.listen(PORT, () => {
+const server = IS_VERCEL ? null : app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
   console.log(`OpenAI assistant: ${ASSISTANT_NAME} (${OPENAI_MODEL})`);
   void connectDatabase();
 });
 
-server.on('error', (error) => {
+server?.on('error', (error) => {
   if (error.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use. Stop the existing backend before starting another one.`);
   } else {
@@ -101,13 +109,16 @@ server.on('error', (error) => {
 
 async function shutdown(signal) {
   console.log(`${signal} received. Shutting down gracefully...`);
+  if (!server) return;
   server.close(async () => {
     await stopDatabase();
     process.exit(0);
   });
 }
 
-process.on('SIGTERM', () => void shutdown('SIGTERM'));
-process.on('SIGINT', () => void shutdown('SIGINT'));
+if (!IS_VERCEL) {
+  process.on('SIGTERM', () => void shutdown('SIGTERM'));
+  process.on('SIGINT', () => void shutdown('SIGINT'));
+}
 
 export default app;

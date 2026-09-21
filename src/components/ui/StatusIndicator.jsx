@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './StatusIndicator.module.css';
 
 const StatusIndicator = ({ isUsingApi, isLoading = false }) => {
+  const [menuSlot, setMenuSlot] = useState(null);
+  useEffect(() => {
+    setMenuSlot(document.getElementById('navigation-status'));
+  }, []);
+
   const getStatus = () => {
     if (isLoading) {
       return {
@@ -28,8 +34,10 @@ const StatusIndicator = ({ isUsingApi, isLoading = false }) => {
 
   const status = getStatus();
 
-  return (
-    <div className={`${styles.statusIndicator} ${styles[status.type]}`} title={status.text}>
+  if (!menuSlot) return null;
+
+  return createPortal(
+    <div tabIndex={0} role="img" aria-label={status.text} className={`${styles.statusIndicator} ${styles[status.type]}`} title={status.text}>
       <div className={styles.statusIcon}>
         {status.icon}
       </div>
@@ -48,7 +56,8 @@ const StatusIndicator = ({ isUsingApi, isLoading = false }) => {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    menuSlot
   );
 };
 

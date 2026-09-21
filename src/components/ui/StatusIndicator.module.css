@@ -1,29 +1,28 @@
 .statusIndicator {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 900;
+  position: relative;
+  border-radius: 10px;
   cursor: help;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .statusIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
   background: var(--color-canvas-subtle);
-  border: 2px solid var(--color-border-default);
+  border: 1px solid var(--color-border-default);
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .statusIndicator:hover .statusIcon {
-  transform: scale(1.1);
+  border-color: var(--color-fg-default);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
@@ -72,7 +71,8 @@
   backdrop-filter: blur(12px);
 }
 
-.statusIndicator:hover .statusTooltip {
+.statusIndicator:hover .statusTooltip,
+.statusIndicator:focus-visible .statusTooltip {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -98,23 +98,12 @@
   line-height: 1.3;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  .statusIndicator {
-    top: 0.5rem;
-    right: 0.5rem;
-  }
-  
-  .statusIcon {
-    width: 35px;
-    height: 35px;
-    font-size: 1rem;
-  }
-  
-  .statusTooltip {
-    min-width: 240px;
-    right: -10px;
-  }
+ .statusIndicator:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .statusTooltip { min-width: 0; width: min(260px, calc(100vw - 2rem)); }
 }
 
 /* Ensure tooltip appears above other elements */

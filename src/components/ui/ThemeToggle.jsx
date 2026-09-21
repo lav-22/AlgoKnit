@@ -1,35 +1,13 @@
-// src/components/ui/ThemeToggle.jsx
-import React from "react";
+import React from 'react';
 
-
-
-export default function ThemeToggle({ theme, onToggle }) {
-  const isDark = theme === "dark";
-
+export default function ThemeToggle({ theme, onToggle, className }) {
+  const isDark = theme === 'dark';
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label="Toggle theme"
-      title="Toggle theme"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "8px 12px",
-        borderRadius: 999,
-        border: "1px solid var(--border)",
-        background: "var(--panel)",
-        color: "var(--text)",
-        cursor: "pointer",
-      }}
-    >
-      <span style={{ fontSize: 14 }}>
-        {isDark ? "☀️ Light" : "🌙 Dark" }
-      </span>
+    <button type="button" onClick={onToggle} className={className}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+      title={`Switch to ${isDark ? 'light' : 'dark'} theme`}>
+      <span aria-hidden="true">{isDark ? '☀️' : '🌙'}</span>
+      <span>{isDark ? 'Light' : 'Dark'}</span>
     </button>
   );
 }
-
-
-
